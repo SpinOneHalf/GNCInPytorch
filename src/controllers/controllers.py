@@ -36,5 +36,5 @@ class LookUpTable(nn.Module):
         super().__init__()
         self.us = nn.Parameter(us)
         self.t_range = nn.Parameter(t_range,requires_grad=False)
-    def forward(self,xr,t):
+    def forward(self,x,t):
         return interpolate_to_support(self.t_range,self.us,t)

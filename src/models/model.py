@@ -10,7 +10,7 @@ class LinearModel(nn.Module):
         self.g = nn.Parameter(torch.Tensor([gamma]))
         self.m = nn.Parameter(torch.Tensor([mass]))
 
-    def forward(self, x: torch.tensor, u: callable, t: torch.tensor):
+    def forward(self,x:torch.tensor,t:torch.tensor,u:callable):
         dx = torch.Tensor([0, 0])
         dx[0] = x[1]
         dx[1] = (1 / self.m) * (-self.k * x[0] - self.g * x[1] + u(x, t))
