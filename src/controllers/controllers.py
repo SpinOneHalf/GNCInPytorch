@@ -11,24 +11,15 @@ def interpolate_to_support(x: torch.Tensor, y: torch.Tensor, support: torch.Tens
     :return:
     """
     # Evaluate the forward difference for all except the edge points
-    slope = torch.zeros_like(x)
-    slope[1:-1] = ((y[1:] - y[:-1]) / (x[1:] - x[:-1]))[1:]
-
-    # Evaluate which of the support points are within the range of x
-    support_nonzero_mask = (support >= x.min()) & (support <= x.max())
-    # Subset the support points accordingly
-    support_nonzero = support[support_nonzero_mask]
+    slope = torch.zeros_like(y)
+    slope[:,1:-1] = ((y[:,1:] - y[:,:-1]) / (x[1:] - x[:-1]))[:,1:]
     # Get the indices of the closest point to the left for each support point
-    support_insert_indices = torch.searchsorted(x, support_nonzero)
+    support_insert_indices = torch.searchsorted(x, support)-1
     # Get the offset from the point to the left to the support point
-    support_nonzero_offset = support_nonzero - x[support_insert_indices]
+    support_nonzero_offset = support - x[support_insert_indices]
     # Calculate the value for the nonzero support: value of the point to the left plus slope times offset
-    support_nonzero_values = y[support_insert_indices] + slope[support_insert_indices - 1] * support_nonzero_offset
-
-    # Create the output tensor and place the nonzero support
-    support_values = torch.zeros_like(support).float()
-    support_values[support_nonzero_mask] = support_nonzero_values
-    return support_values
+    support_nonzero_values = y[:,support_insert_indices] + slope[:,support_insert_indices - 1] * support_nonzero_offset
+    return support_nonzero_values
 
 
 class LookUpTable(nn.Module):
